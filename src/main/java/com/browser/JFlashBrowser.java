@@ -4,31 +4,44 @@ import com.teamdev.jxbrowser.chromium.Browser;
 import com.teamdev.jxbrowser.chromium.BrowserPreferences;
 import com.teamdev.jxbrowser.chromium.swing.BrowserView;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.exec.OS;
+
+import javax.swing.*;
 
 /**
  * This sample loads a web page with simple Flash content.
  * https://get.adobe.com/flashplayer/otherversions/
  */
 public class JFlashBrowser {
+    /**
+     * Main entry point
+     * @param args
+     */
     public static void main(String... args) {
 
         System.setProperty("teamdev.license.info", "true");
+
         File dirPlugin = new File("lib");
-        File pluginFile = new File(dirPlugin, getPluginName(dirPlugin));
-        String ppapiFlashPath = pluginFile.getAbsolutePath();
-        String ppapiFlashVersion = pluginFile.getName().split("_")[0];
-        System.out.println("ppapiFlashPath:" + ppapiFlashPath);
-        BrowserPreferences.setChromiumSwitches(
-                "--ppapi-flash-path=" + ppapiFlashPath,
-                "--ppapi-flash-version=" + ppapiFlashVersion);
+
+        List<String> ppapiChromiumConfigurations = new ArrayList();
+        File[] pluginFilesByExtension = getFilesByExtension(dirPlugin, getPluginAccordingToPlatform());
+        for(File pluginFile : pluginFilesByExtension){
+            String ppapiFlashPath = pluginFile.getAbsolutePath();
+            String ppapiFlashVersion = pluginFile.getName().split("_")[0];
+
+            ppapiChromiumConfigurations.add("--ppapi-flash-path=" + ppapiFlashPath);
+            ppapiChromiumConfigurations.add("--ppapi-flash-version=" + ppapiFlashVersion);
+        }
+
+
+        BrowserPreferences.setChromiumSwitches(ppapiChromiumConfigurations.toArray(new String[0]));
         Browser browser = new Browser();
         BrowserView view = new BrowserView(browser);
 
@@ -44,7 +57,7 @@ public class JFlashBrowser {
             }
         });
 
-        JLabel statusBar = new JLabel(ppapiFlashVersion + " - " + ppapiFlashPath);
+        JLabel statusBar = new JLabel("Press ENTER to browse");
         frame.add(address, BorderLayout.NORTH);
         frame.add(view, BorderLayout.CENTER);
         frame.add(statusBar, BorderLayout.SOUTH);
@@ -54,19 +67,6 @@ public class JFlashBrowser {
         address.requestFocus();
 
         doKeyEnter();
-    }
-
-    private static String getPluginName(File dir){
-        if ( OS.isFamilyUnix() ){
-            return getFirstFileByExtension(dir, ".so");
-        }
-        else if (OS.isFamilyMac()){
-            return getFirstFileByExtension(dir, ".plugin");
-        }
-        else if (OS.isFamilyWindows()){
-            return getFirstFileByExtension(dir, ".dll");
-        }
-        throw new RuntimeException("Invalid platform!");
     }
 
     private static void doKeyEnter(){
@@ -80,20 +80,31 @@ public class JFlashBrowser {
         }
     }
 
-    public static String getFirstFileByExtension(File dir, String extension)
-    {
-        if ( dir.isDirectory() )
-        {
-
-            String[] list = dir.list((f, s) -> s.endsWith(extension));
-
-            if ( list.length > 0 )
-            {
-                return list[0];
-            }
+    public static String getPluginAccordingToPlatform(){
+        String pluginExtension;
+        if(OS.isFamilyMac())
+            pluginExtension = ".plugin";
+        else if (OS.isFamilyMac()){
+            pluginExtension = ".plugin";
         }
+        else if ( OS.isFamilyUnix() ){
+            pluginExtension = ".so";
+        }
+        else if (OS.isFamilyWindows()){
+            pluginExtension = ".dll";
+        }else{
+            throw new RuntimeException("Invalid platform " + System.getProperty( "os.name" ) );
+        }
+        return pluginExtension;
+    }
 
-        return "";
+    public static File[] getFilesByExtension(File dir, String extension)
+    {
+        File[] list = new File[0];
+        if ( dir.isDirectory() ) {
+            list = dir.listFiles((f, s) -> s.endsWith(extension));
+        }
+        return list;
 
     }
 }

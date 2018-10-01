@@ -1,23 +1,24 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.java</groupId>
-  <artifactId>jflash-browser</artifactId>
-  <packaging>jar</packaging>
-  <version>1.0</version>
-  <properties>
-    <!-- maven-compiler-plugin configuration -->
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-  </properties>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.java</groupId>
+    <artifactId>jflash-browser</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0</version>
+    <properties>
+        <!-- maven-compiler-plugin configuration -->
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
-<repositories>
-    <repository>
-        <id>nexus-jxbrowser</id>
-        <name>jxbrowser</name>
-        <url> http://murky.fishbowldev.com:8081/nexus/content/repositories/releases/</url>
-    </repository>
-</repositories>
+    <repositories>
+        <repository>
+            <id>nexus-jxbrowser</id>
+            <name>jxbrowser</name>
+            <url>http://murky.fishbowldev.com:8081/nexus/content/repositories/releases/</url>
+        </repository>
+    </repositories>
 
     <build>
 
@@ -25,6 +26,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.0</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -72,51 +74,87 @@
     </build>
 
 
-  <dependencies>
+    <dependencies>
 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
-      <scope>test</scope>
-    </dependency>
-
-
-    <!-- https://mvnrepository.com/artifact/jxbrowser/jxbrowser -->
-    <dependency>
-      <groupId>jxbrowser</groupId>
-      <artifactId>jxbrowser</artifactId>
-      <version>6.1.1</version>
-    </dependency>
-
-      <!-- https://mvnrepository.com/artifact/jxbrowser/jxbrowser-win -->
-      <dependency>
-          <groupId>jxbrowser</groupId>
-          <artifactId>jxbrowser-win</artifactId>
-          <version>6.1.1</version>
-      </dependency>
-
-      <!-- https://mvnrepository.com/artifact/jxbrowser/jxbrowser-linux -->
-      <dependency>
-          <groupId>jxbrowser</groupId>
-          <artifactId>jxbrowser-linux</artifactId>
-          <version>6.1.1</version>
-      </dependency>
-
-      <!-- https://mvnrepository.com/artifact/jxbrowser/jxbrowser-mac -->
-      <dependency>
-          <groupId>jxbrowser</groupId>
-          <artifactId>jxbrowser-mac</artifactId>
-          <version>6.1.1</version>
-      </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
 
 
-      <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-exec -->
-      <dependency>
-          <groupId>org.apache.commons</groupId>
-          <artifactId>commons-exec</artifactId>
-          <version>1.3</version>
-      </dependency>
+        <!-- https://mvnrepository.com/artifact/jxbrowser/jxbrowser -->
+        <dependency>
+            <groupId>jxbrowser</groupId>
+            <artifactId>jxbrowser</artifactId>
+            <version>6.1.1</version>
+        </dependency>
 
-  </dependencies>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-exec -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-exec</artifactId>
+            <version>1.3</version>
+        </dependency>
+
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>mac</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <dependencies>
+                <!-- https://mvnrepository.com/artifact/jxbrowser/jxbrowser-mac -->
+                <dependency>
+                    <groupId>jxbrowser</groupId>
+                    <artifactId>jxbrowser-mac</artifactId>
+                    <version>6.1.1</version>
+                </dependency>
+
+            </dependencies>
+
+        </profile>
+        <profile>
+            <id>unix</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>Linux</name>
+                </os>
+            </activation>
+            <dependencies>
+                <!-- https://mvnrepository.com/artifact/jxbrowser/jxbrowser-linux -->
+                <dependency>
+                    <groupId>jxbrowser</groupId>
+                    <artifactId>jxbrowser-linux</artifactId>
+                    <version>6.1.1</version>
+                </dependency>
+
+            </dependencies>
+        </profile>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <dependencies>
+
+                <!-- https://mvnrepository.com/artifact/jxbrowser/jxbrowser-win -->
+                <dependency>
+                    <groupId>jxbrowser</groupId>
+                    <artifactId>jxbrowser-win</artifactId>
+                    <version>6.1.1</version>
+                </dependency>
+
+            </dependencies>
+        </profile>
+    </profiles>
 </project>
