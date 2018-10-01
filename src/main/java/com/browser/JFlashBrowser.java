@@ -1,19 +1,18 @@
 package com.browser;
 
-import com.teamdev.jxbrowser.chromium.Browser;
-import com.teamdev.jxbrowser.chromium.BrowserPreferences;
-import com.teamdev.jxbrowser.chromium.swing.BrowserView;
-
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.exec.OS;
+import com.teamdev.jxbrowser.chromium.*;
+import org.apache.commons.io.FileUtils;
 
 import javax.swing.*;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.logging.*;
+import java.util.List;
 
 /**
  * This sample loads a web page with simple Flash content.
@@ -24,87 +23,115 @@ public class JFlashBrowser {
      * Main entry point
      * @param args
      */
-    public static void main(String... args) {
+    public static void main(String... args) throws IOException {
 
         System.setProperty("teamdev.license.info", "true");
 
-        File dirPlugin = new File("lib");
+        BrowserPreferences.setChromiumSwitches(Settings.getPluginConfiguration());
 
-        List<String> ppapiChromiumConfigurations = new ArrayList();
-        File[] pluginFilesByExtension = getFilesByExtension(dirPlugin, getPluginAccordingToPlatform());
-        for(File pluginFile : pluginFilesByExtension){
-            String ppapiFlashPath = pluginFile.getAbsolutePath();
-            String ppapiFlashVersion = pluginFile.getName().split("_")[0];
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        tabbedPane.setTabPlacement(JTabbedPane.BOTTOM);
 
-            ppapiChromiumConfigurations.add("--ppapi-flash-path=" + ppapiFlashPath);
-            ppapiChromiumConfigurations.add("--ppapi-flash-version=" + ppapiFlashVersion);
-        }
-
-
-        BrowserPreferences.setChromiumSwitches(ppapiChromiumConfigurations.toArray(new String[0]));
         Browser browser = new Browser();
-        BrowserView view = new BrowserView(browser);
+        BrowserPanel browserPanel = new BrowserPanel(browser);
+
+        tabbedPane.addTab("Browser", browserPanel);
 
         JFrame frame = new JFrame("JFlashBrowser");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        JTextField address = new JTextField("http://www.webthrower.com/portfolio/narnia.htm");
-        address.addActionListener( new AbstractAction()
-        {
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
-                browser.loadURL(address.getText());
-            }
-        });
 
-        JLabel statusBar = new JLabel("Press ENTER to browse");
-        frame.add(address, BorderLayout.NORTH);
-        frame.add(view, BorderLayout.CENTER);
-        frame.add(statusBar, BorderLayout.SOUTH);
+        frame.add(tabbedPane);
         frame.setSize(800, 600);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
-        address.requestFocus();
 
-        doKeyEnter();
-    }
 
-    private static void doKeyEnter(){
-        try {
-            Robot robot = new Robot();
-            robot.keyPress(KeyEvent.VK_ENTER);
-            robot.delay(1000);
-            robot.keyRelease(KeyEvent.VK_ENTER);
-        } catch (AWTException e) {
-            e.printStackTrace();
-        }
-    }
+        writeLog("log/");
+        writeConsoleLog(browser);
+        interceptFilesByExtension(browser, Arrays.asList("swf", "dcr") );
 
-    public static String getPluginAccordingToPlatform(){
-        String pluginExtension;
-        if(OS.isFamilyMac())
-            pluginExtension = ".plugin";
-        else if (OS.isFamilyMac()){
-            pluginExtension = ".plugin";
-        }
-        else if ( OS.isFamilyUnix() ){
-            pluginExtension = ".so";
-        }
-        else if (OS.isFamilyWindows()){
-            pluginExtension = ".dll";
-        }else{
-            throw new RuntimeException("Invalid platform " + System.getProperty( "os.name" ) );
-        }
-        return pluginExtension;
-    }
-
-    public static File[] getFilesByExtension(File dir, String extension)
-    {
-        File[] list = new File[0];
-        if ( dir.isDirectory() ) {
-            list = dir.listFiles((f, s) -> s.endsWith(extension));
-        }
-        return list;
+        browserPanel.getAddress().requestFocus();
 
     }
+
+    private static void writeLog(String logFolder) throws IOException {
+        LoggerProvider.setLevel(Level.ALL);
+
+        // Redirect Browser log messages to jxbrowser-browser.log
+        redirectLogMessagesToFile(LoggerProvider.getBrowserLogger(),
+                logFolder + "jxbrowser-browser.log");
+
+        // Redirect IPC log messages to jxbrowser-ipc.log
+        redirectLogMessagesToFile(LoggerProvider.getIPCLogger(),
+                logFolder + "jxbrowser-ipc.log");
+
+        // Redirect Chromium Process log messages to jxbrowser-chromium.log
+        redirectLogMessagesToFile(LoggerProvider.getChromiumProcessLogger(),
+                logFolder + "jxbrowser-chromium.log");
+    }
+
+
+    private static void writeConsoleLog(Browser browser){
+        browser.addConsoleListener(event -> {
+            LoggerProvider.getBrowserLogger().fine(event.getLevel() + " - " + event.getMessage());
+        });
+    }
+
+    private static void redirectLogMessagesToFile(Logger logger, String logFilePath)
+            throws IOException {
+        FileHandler fileHandler = new FileHandler(logFilePath);
+        fileHandler.setFormatter(new SimpleFormatter());
+
+        // Remove default handlers including console handler
+        for (Handler handler : logger.getHandlers()) {
+            logger.removeHandler(handler);
+        }
+        logger.addHandler(fileHandler);
+    }
+
+    private static void interceptFilesByExtension(Browser browser,  List<String> extensions){
+        NetworkService networkService = browser.getContext().getNetworkService();
+        networkService.setResourceHandler(params -> {
+
+            URL url;
+            try {
+                url = URI.create(params.getURL()).toURL();
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            }
+
+            String resourceName = getFileName(url.getFile());
+            String resourceExtension =  getFileExtension(resourceName);
+
+            if(ResourceType.SUB_RESOURCE.equals(params.getResourceType()) && extensions.contains(resourceExtension) ){
+                File outDir = new File(resourceExtension);
+                if(!outDir.exists()) outDir.mkdir();
+                File downloadFile = new File(outDir, resourceName);
+
+                 Runnable download = () -> {
+                    try {
+                        FileUtils.copyURLToFile(url, downloadFile);
+                    } catch (IOException e) {
+                        LoggerProvider.getBrowserLogger().severe(e.getMessage());
+                    }
+                };
+                new Thread(download).start();
+
+            }
+            return true;
+        });
+
+    }
+
+    private static String getFileExtension(String fileName){
+        String parts [] = fileName.split("\\.");
+        return parts.length > 0 ? parts[parts.length-1]: null;
+    }
+
+    private static String getFileName(String fileName){
+        String parts [] = fileName.split("/");
+        return parts.length > 0 ? parts[parts.length-1]: null;
+    }
+
 }
