@@ -47,7 +47,7 @@ public class JFlashBrowser {
         frame.setVisible(true);
 
 
-        writeLog("log/");
+        writeLog(new File("log"));
         writeConsoleLog(browser);
         interceptFilesByExtension(browser, Arrays.asList("swf", "dcr") );
 
@@ -55,20 +55,24 @@ public class JFlashBrowser {
 
     }
 
-    private static void writeLog(String logFolder) throws IOException {
+    private static void writeLog(File logFolder) throws IOException {
+        if(!logFolder.exists()){
+            logFolder.mkdir();
+        }
+
         LoggerProvider.setLevel(Level.ALL);
 
         // Redirect Browser log messages to jxbrowser-browser.log
         redirectLogMessagesToFile(LoggerProvider.getBrowserLogger(),
-                logFolder + "jxbrowser-browser.log");
+                logFolder.getAbsolutePath() + "jxbrowser-browser.log");
 
         // Redirect IPC log messages to jxbrowser-ipc.log
         redirectLogMessagesToFile(LoggerProvider.getIPCLogger(),
-                logFolder + "jxbrowser-ipc.log");
+                logFolder.getAbsolutePath() + "jxbrowser-ipc.log");
 
         // Redirect Chromium Process log messages to jxbrowser-chromium.log
         redirectLogMessagesToFile(LoggerProvider.getChromiumProcessLogger(),
-                logFolder + "jxbrowser-chromium.log");
+                logFolder.getAbsolutePath() + "jxbrowser-chromium.log");
     }
 
 
