@@ -8,6 +8,8 @@ import java.util.List;
 
 public class Settings {
 
+    public final static String INITIAL_PAGE = "http://www.webthrower.com/portfolio/narnia.htm";
+
     public static String[] getPluginConfiguration() {
         File dirPlugin = new File("lib");
 

@@ -19,7 +19,7 @@ public class BrowserPanel extends JPanel {
 
         setLayout( new BorderLayout());
 
-        address = new JTextField("http://www.webthrower.com/portfolio/narnia.htm");
+        address = new JTextField(Settings.INITIAL_PAGE);
         address.addActionListener( new AbstractAction()
         {
             @Override

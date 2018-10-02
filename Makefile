@@ -18,5 +18,7 @@ headless: package
 x11vnc:
 	x11vnc -display :99 -localhost
 
+docker_server: headless x11vnc
+
 vncviewer:
 	vncviewer :0
