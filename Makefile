@@ -12,13 +12,16 @@ clean:
 docker_build:
 	docker build --no-cache -t jflash-browser .
 
+docker_run:
+	docker run -ti -p 5900:5900 jflash-browser make docker_serve
+
 headless: package
-	Xvfb :99 -ac -screen 0 1024x768x16 & export DISPLAY=":99" & java -jar jflash.jar
+	Xvfb :99 -ac -screen 0 1024x768x16 && export DISPLAY=":99" && xvfb-run java -jar jflash.jar &
 
 x11vnc:
-	x11vnc -display :99 -localhost
+	x11vnc -display :99
 
-docker_server: headless x11vnc
+serve: headless x11vnc
 
 vncviewer:
-	vncviewer :0
+	vncviewer :99

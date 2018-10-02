@@ -52,6 +52,7 @@ public class JFlashBrowser {
         interceptFilesByExtension(browser, Arrays.asList("swf", "dcr") );
 
         browserPanel.getAddress().requestFocus();
+        browser.loadURL(browserPanel.getAddress().getText());
 
     }
 
