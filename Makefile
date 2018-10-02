@@ -9,8 +9,11 @@ clean:
 	mvn clean
 	rm -rf jflash.jar log/* swf/*
 
+docker_build:
+	docker build --no-cache -t jflash-browser .
+
 headless: package
-	Xvfb :99 -ac -screen 0 1024x768x16 & export DISPLAY=":99" && java -jar jflash.jar
+	Xvfb :99 -ac -screen 0 1024x768x16 & export DISPLAY=":99" & java -jar jflash.jar
 
 x11vnc:
 	x11vnc -display :99 -localhost
