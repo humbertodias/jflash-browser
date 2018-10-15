@@ -1,5 +1,5 @@
 package:
-	mvn clean package
+	mvn package
 	mv target/jflash-browser-1.0-jar-with-dependencies.jar jflash.jar
 
 run: package
@@ -16,10 +16,12 @@ docker_run:
 	docker run -ti -p 5900:5900 jflash-browser make serve
 
 headless: package
-	Xvfb :99 -ac -screen 0 1024x768x16 && export DISPLAY=":99" && xvfb-run java -jar jflash.jar &
+	export DISPLAY=":99" && Xvfb :99 -ac -screen 0 1024x768x16 & xvfb-run -a java -jar jflash.jar &
 
 x11vnc:
-	x11vnc -ncache 10 -display :99
+	mkdir ~/.x11vnc
+	x11vnc -storepasswd password ~/.x11vnc/passwd
+	x11vnc -display :99
 
 serve: headless x11vnc
 

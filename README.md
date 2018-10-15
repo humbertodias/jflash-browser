@@ -33,9 +33,14 @@ Downloader
 
 ![](doc/downloader.png) 
 
+Click on upper right button to open the folder with downloaded files, following the filter by extension.
+
 
 # References
 
 * [JxBrowser](https://www.teamdev.com/jxbrowser) 
 
 * [Shockwave player](https://helpx.adobe.com/shockwave.html?red=a)
+
+* [Flash player](https://helpx.adobe.com/flash-player.html)
+
