@@ -7,7 +7,7 @@ run: package
 
 clean:
 	mvn clean
-	rm -rf jflash.jar log/* swf/*
+	rm -rf jflash.jar log/* download/*
 
 docker_build:
 	docker build --no-cache -t jflash-browser .

@@ -18,7 +18,7 @@ public class BrowserPanel extends JPanel {
 
     setLayout(new BorderLayout());
 
-    address = new JTextField(Settings.INITIAL_PAGE);
+    address = new JTextField();
     address.addActionListener(
         new AbstractAction() {
           @Override
