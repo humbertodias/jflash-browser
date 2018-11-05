@@ -95,17 +95,6 @@
             <scope>test</scope>
         </dependency>
 
-
-        <!-- https://mvnrepository.com/artifact/jxbrowser/jxbrowser -->
-        <!--
-        <dependency>
-            <groupId>com.teamdev.jxbrowser</groupId>
-            <artifactId>jxbrowser-cross-platform</artifactId>
-            <version>${jxbrowser.version}</version>
-        </dependency>
-        -->
-
-
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-exec -->
         <dependency>
             <groupId>org.apache.commons</groupId>
