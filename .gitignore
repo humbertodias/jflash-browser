@@ -18,3 +18,9 @@ download/
 *.iml
 jflash.jar
 .DS_Store
+
+.classpath
+.project
+.vscode
+.settings
+bin

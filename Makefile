@@ -1,9 +1,23 @@
+UNAME := $(shell uname)
+
 package:
 	mvn package
 	mv target/jflash-browser-1.0-jar-with-dependencies.jar jflash.jar
 
-run: package
+backtime:
+ifeq ($(UNAME), Linux)
+	sudo timedatectl set-ntp 0
+	sudo date --set="20181001 21:14:00"
+endif
+
+curtime:
+ifeq ($(UNAME), Linux)
+	sudo timedatectl set-ntp 1
+endif
+
+run: package	backtime
 	java -jar jflash.jar
+	make curtime
 
 clean:
 	mvn clean

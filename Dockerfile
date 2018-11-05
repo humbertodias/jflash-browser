@@ -13,4 +13,4 @@ WORKDIR /jflash
 ADD . /jflash
 RUN make package
 
-EXPOSE 5900]
+EXPOSE 5900
