@@ -9,15 +9,17 @@ ifeq ($(UNAME), Linux)
 	sudo timedatectl set-ntp 0
 	sudo date --set="20181001 00:00:00"
 endif
-
 ifeq ($(UNAME),Darwin)
 	#date {month}{day}{hour}{minute}{year}
-	sudo date 010100002018
+	sudo date 100100002018
 endif
 
 curtime:
 ifeq ($(UNAME), Linux)
 	sudo timedatectl set-ntp 1
+endif
+ifeq ($(UNAME),Darwin)
+	sudo sntp -sS time.apple.com
 endif
 
 run: package	backtime
