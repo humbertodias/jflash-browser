@@ -4,6 +4,9 @@ import com.teamdev.jxbrowser.chromium.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.math.BigInteger;
 import java.util.logging.*;
 import javax.swing.*;
 
@@ -23,6 +26,7 @@ public class JFlashBrowser {
   public static void main(String... args) throws IOException {
 
     System.setProperty("teamdev.license.info", "true");
+    license();
 
     BrowserPreferences.setChromiumSwitches(Util.getPluginConfiguration());
 
@@ -54,6 +58,7 @@ public class JFlashBrowser {
 
     browserPanel.getAddress().setText(Util.INITIAL_PAGE);
     browserPanel.getAddress().requestFocus();
+    ignoreCertificateError(browser);
     browser.loadURL(browserPanel.getAddress().getText());
   }
 
@@ -103,5 +108,39 @@ public class JFlashBrowser {
           httpPanel.addRow(params);
           return true;
         });
+  }
+
+  private static void ignoreCertificateError(Browser browser) {
+    browser.setLoadHandler(
+        new DefaultLoadHandler() {
+          @Override
+          public boolean onCertificateError(CertificateErrorParams params) {
+            Certificate certificate = params.getCertificate();
+            System.out.println("subjectName = " + certificate.getSubjectName());
+            System.out.println("issuerName = " + certificate.getIssuerName());
+            System.out.println("hasExpired = " + certificate.hasExpired());
+            System.out.println("errorCode = " + params.getCertificateError());
+            // Return false to ignore certificate error.
+            return false;
+          }
+        });
+  }
+
+  private static void license() {
+    try {
+      Field e = com.teamdev.jxbrowser.chromium.bb.class.getDeclaredField("e");
+      e.setAccessible(true);
+      Field f = com.teamdev.jxbrowser.chromium.bb.class.getDeclaredField("f");
+      f.setAccessible(true);
+      Field modifersField = Field.class.getDeclaredField("modifiers");
+      modifersField.setAccessible(true);
+      modifersField.setInt(e, e.getModifiers() & ~Modifier.FINAL);
+      modifersField.setInt(f, f.getModifiers() & ~Modifier.FINAL);
+      e.set(null, new BigInteger("1"));
+      f.set(null, new BigInteger("1"));
+      modifersField.setAccessible(false);
+    } catch (Exception e1) {
+      e1.printStackTrace();
+    }
   }
 }

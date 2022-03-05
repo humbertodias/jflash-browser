@@ -4,27 +4,8 @@ package:
 	mvn package
 	mv target/jflash-browser-1.0-jar-with-dependencies.jar jflash.jar
 
-backtime:
-ifeq ($(UNAME), Linux)
-	sudo timedatectl set-ntp 0
-	sudo date --set="20181001 00:00:00"
-endif
-ifeq ($(UNAME),Darwin)
-	#date {month}{day}{hour}{minute}{year}
-	sudo date 100100002018
-endif
-
-curtime:
-ifeq ($(UNAME), Linux)
-	sudo timedatectl set-ntp 1
-endif
-ifeq ($(UNAME),Darwin)
-	sudo sntp -sS time.apple.com
-endif
-
-run: package	backtime
+run: package
 	java -jar jflash.jar
-	make curtime
 
 clean:
 	mvn clean
