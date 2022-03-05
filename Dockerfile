@@ -9,8 +9,7 @@ RUN useradd -ms /bin/bash jflash
 USER jflash
 WORKDIR /home/jflash
 
-WORKDIR /jflash
-ADD . /jflash
+COPY . .
 RUN make package
 
 EXPOSE 5900
