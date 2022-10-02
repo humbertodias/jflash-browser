@@ -89,9 +89,16 @@
     <dependencies>
 
         <dependency>
+            <groupId>com.teamdev.jxbrowser</groupId>
+            <artifactId>jxbrowser-cross-platform</artifactId>
+            <version>${jxbrowser.version}</version>
+            <type>pom</type>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13.1</version>
+            <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
 
@@ -106,67 +113,9 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.7</version>
+            <version>2.11.0</version>
         </dependency>
 
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>mac</id>
-            <activation>
-                <os>
-                    <family>mac</family>
-                </os>
-            </activation>
-            <dependencies>
-
-                <!-- https://mvnrepository.com/artifact/jxbrowser/jxbrowser-mac -->
-                <dependency>
-                    <groupId>com.teamdev.jxbrowser</groupId>
-                    <artifactId>jxbrowser-mac</artifactId>
-                      <version>${jxbrowser.version}</version>
-                </dependency>
-
-            </dependencies>
-
-        </profile>
-        <profile>
-            <id>unix</id>
-            <activation>
-                <os>
-                    <family>unix</family>
-                    <name>Linux</name>
-                </os>
-            </activation>
-            <dependencies>
-            
-                <!-- https://mvnrepository.com/artifact/jxbrowser/jxbrowser-linux -->
-                <dependency>
-                        <groupId>com.teamdev.jxbrowser</groupId>
-                    <artifactId>jxbrowser-linux64</artifactId>
-                      <version>${jxbrowser.version}</version>
-                </dependency>
-
-            </dependencies>
-        </profile>
-        <profile>
-            <id>windows</id>
-            <activation>
-                <os>
-                    <family>windows</family>
-                </os>
-            </activation>
-            <dependencies>
-
-                <!-- https://mvnrepository.com/artifact/jxbrowser/jxbrowser-win -->
-                <dependency>
-                        <groupId>com.teamdev.jxbrowser</groupId>
-                        <artifactId>jxbrowser-win32</artifactId>
-                      <version>${jxbrowser.version}</version>
-                </dependency>
-
-            </dependencies>
-        </profile>
-    </profiles>
 </project>
