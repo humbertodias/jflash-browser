@@ -10,7 +10,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jxbrowser.version>6.23.1</jxbrowser.version>
+        <jxbrowser.version>6.24.3</jxbrowser.version>
     </properties>
 
     <repositories>
